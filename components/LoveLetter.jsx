@@ -172,8 +172,8 @@ export default function LoveLetter() {
   if (!quizStarted && !quizCompleted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center border-2 border-rose-200">
-          <div className="text-6xl mb-6">💌</div>
+        <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center border-2 border-rose-200 animate-fadeInUp">
+          <div className="text-6xl mb-6 animate-bounce">💌</div>
           <h1 className="text-3xl font-serif text-amber-900 mb-4">A Letter Awaits</h1>
           <p className="text-amber-800/80 mb-6 leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
             Before you can read this special letter, please answer a few questions about our memories together. 
@@ -191,7 +191,7 @@ export default function LoveLetter() {
           </div>
           <button
             onClick={() => setQuizStarted(true)}
-            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-3 rounded-full font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-3 rounded-full font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 active:shadow-md"
           >
             Start Quiz
           </button>
@@ -203,7 +203,7 @@ export default function LoveLetter() {
   if (quizStarted && !quizCompleted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border-2 border-rose-200">
+        <div className="max-w-2xl w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border-2 border-rose-200 animate-fadeInUp">
           {/* Progress bar */}
           <div className="mb-6">
             <div className="flex justify-between text-sm text-amber-800 mb-2">
@@ -228,10 +228,10 @@ export default function LoveLetter() {
                 <button
                   key={index}
                   onClick={() => handleAnswerSelect(index)}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
+                  className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 transform active:scale-95 ${
                     selectedAnswer === index
                       ? 'border-rose-500 bg-rose-50 shadow-md'
-                      : 'border-amber-200 bg-white hover:border-rose-300 hover:bg-rose-25'
+                      : 'border-amber-200 bg-white hover:border-rose-300 hover:bg-rose-25 hover:scale-[1.02]'
                   }`}
                 >
                   <span className="text-amber-900" style={{ fontFamily: 'Georgia, serif' }}>
@@ -246,9 +246,9 @@ export default function LoveLetter() {
           <button
             onClick={handleNextQuestion}
             disabled={selectedAnswer === null}
-            className={`w-full py-3 rounded-full font-medium transition-all duration-300 ${
+            className={`w-full py-3 rounded-full font-medium transition-all duration-300 transform ${
               selectedAnswer !== null
-                ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 shadow-lg hover:shadow-xl'
+                ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
@@ -265,8 +265,8 @@ export default function LoveLetter() {
     
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center border-2 border-rose-200">
-          <div className="text-6xl mb-6">
+        <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center border-2 border-rose-200 animate-fadeInUp">
+          <div className="text-6xl mb-6 animate-bounce">
             {percentage === 100 ? '🎉' : percentage >= 75 ? '😊' : percentage >= 50 ? '🙂' : '💕'}
           </div>
           <h2 className="text-3xl font-serif text-amber-900 mb-4">Quiz Complete!</h2>
@@ -287,7 +287,7 @@ export default function LoveLetter() {
           </p>
           <button
             onClick={() => setShowResult(false)}
-            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-3 rounded-full font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-3 rounded-full font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 active:shadow-md"
           >
             Open Your Letter
           </button>
@@ -318,8 +318,12 @@ export default function LoveLetter() {
         ))}
       </div>
 
-      {/* Main letter container */}
-      <div className={`relative transition-all duration-1000 ${showContent ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+      {/* Main letter container with enhanced entrance animation */}
+      <div className={`relative transition-all duration-1000 ease-out ${
+        showContent 
+          ? 'opacity-100 scale-100 translate-y-0 rotate-0' 
+          : 'opacity-0 scale-75 translate-y-12 -rotate-3'
+      }`}>
         {/* Wax seal */}
         {!isRevealed && (
           <div 
@@ -327,7 +331,7 @@ export default function LoveLetter() {
             onClick={() => setIsRevealed(true)}
           >
             <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-600 to-rose-800 shadow-xl flex items-center justify-center border-4 border-rose-900/30 group-hover:scale-110 transition-transform duration-300">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-600 to-rose-800 shadow-xl flex items-center justify-center border-4 border-rose-900/30 group-hover:scale-110 group-active:scale-90 transition-transform duration-300">
                 <span className="text-rose-100 text-2xl font-serif">❤</span>
               </div>
               <div className="absolute inset-0 rounded-full bg-rose-600/30 blur-md animate-pulse"></div>
@@ -372,7 +376,7 @@ export default function LoveLetter() {
           <div className="absolute inset-6 border border-amber-200/60 pointer-events-none"></div>
 
           {/* Score badge */}
-          <div className="absolute top-4 right-4 bg-rose-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+          <div className="absolute top-4 right-4 bg-rose-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg animate-fadeIn">
             <div className="text-center">
               <div className="text-xl font-bold">{percentage}%</div>
               <div className="text-xs">Score</div>
@@ -488,8 +492,37 @@ export default function LoveLetter() {
           }
         }
 
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
         .heart-float {
           animation: heartFloat 15s infinite ease-in-out;
+        }
+
+        .animate-fadeInUp {
+          animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 1s ease-out 0.5s forwards;
+          opacity: 0;
         }
       `}</style>
     </div>
