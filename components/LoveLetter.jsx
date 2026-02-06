@@ -156,7 +156,7 @@ export default function LoveLetter() {
     I remember when we talked all day long; we were so happy that day, and I can still remember the feeling even until now. 
     I also remember when I immaturely didn't contact you just to see your reaction, and I still remember your reaction enough HAHA.`,
     
-    `The ML we played though is the hilarious one. Remember the time when we played just to lose? You said, 
+    `The ML we played though was the hilarious one. Remember the time when we played just to lose? You said, 
     "Pahuway sa ta bem kay na stress nako HAHAHAHAHAH." The best one is the tender kindness you expressed to me—by 
     expressing to me that I am enough and would surely be accepted by your relatives. It felt really good.`,
     
