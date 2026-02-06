@@ -152,7 +152,7 @@ export default function LoveLetter() {
   };
 
   const paragraphs = [
-    `I still remember the first day with you—the laughter, the joy, the conflicts, and even the contradictions. 
+    `My heart still holds every precious moment from our first day together—the laughter, the joy, the conflicts, and even the contradictions. 
     I remember when we talked all day long; we were so happy that day, and I can still remember the feeling even until now. 
     I also remember when I immaturely didn't contact you just to see your reaction, and I still remember your reaction enough HAHA.`,
     
