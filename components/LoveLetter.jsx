@@ -165,7 +165,7 @@ export default function LoveLetter() {
         "Hope you like it.",
         "Almost There...",
         "Ready?",
-        "Thank you for waiting..."
+        "Thank you for the wait..."
       ];
       let messageIndex = 0;
       let charIndex = 0;
@@ -560,7 +560,7 @@ export default function LoveLetter() {
           {verificationStep === 0 && (
             <div className="text-center animate-fadeIn">
               <h2 className="text-xl sm:text-2xl font-serif text-rose-900 mb-6 sm:mb-8 px-2">
-                Am I handsome to you (hi gwapa)?
+                Am I handsome to you? (hi gwapa)
               </h2>
               <div className="flex gap-3 sm:gap-4 justify-center relative" style={{ minHeight: '60px' }}>
                 <button
@@ -580,7 +580,7 @@ export default function LoveLetter() {
                     left: `${noButtonPosition.left}%`,
                   } : {}}
                 >
-                  No
+                  No 😭
                 </button>
               </div>
             </div>
@@ -639,8 +639,8 @@ export default function LoveLetter() {
                     top: `${noButtonPosition.top}%`,
                     left: `${noButtonPosition.left}%`,
                   } : {}}
-                >
-                  No
+                > 
+                  No 😭
                 </button>
               </div>
             </div>
