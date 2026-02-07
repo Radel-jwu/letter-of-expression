@@ -139,7 +139,7 @@ export default function LoveLetter() {
 
   useEffect(() => {
     if (showFinalMessage) {
-      const message = "Salamat Gryzelle ug pag amping pirmi and Happy Heart's day!";
+      const message = "Salamat Gryzelle ug pag amping pirmi and Happy Hearts day!";
       let index = 0;
       const typingInterval = setInterval(() => {
         if (index <= message.length) {
@@ -302,7 +302,7 @@ export default function LoveLetter() {
             <div className="text-7xl mb-4 animate-bounce">💝</div>
             <h1 className="text-4xl font-serif text-rose-900 mb-3">Verification</h1>
             <p className="text-rose-700/80" style={{ fontFamily: 'Georgia, serif' }}>
-              Before we begin, I need to verify it's really you...
+              Before we begin, I need to verify if this is really you...
             </p>
           </div>
 
@@ -317,7 +317,7 @@ export default function LoveLetter() {
           {verificationStep === 0 && (
             <div className="text-center animate-fadeIn">
               <h2 className="text-2xl font-serif text-rose-900 mb-8">
-                Am I handsome to you (igop)?
+                Am I handsome to you (hi gwapo)?
               </h2>
               <div className="flex gap-4 justify-center relative" style={{ minHeight: '60px' }}>
                 <button
@@ -351,7 +351,7 @@ export default function LoveLetter() {
                   <div className="text-6xl mb-4">⭐</div>
                   <h3 className="text-2xl font-serif text-rose-900 mb-2">Rate Me!</h3>
                   <p className="text-rose-700/80" style={{ fontFamily: 'Georgia, serif' }}>
-                    From 1 to 10, how handsome am I?
+                    From 1 to 10, unsa ko ka gwapo?
                   </p>
                 </div>
                 <div className="grid grid-cols-5 gap-3">
@@ -423,8 +423,7 @@ export default function LoveLetter() {
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
               <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 max-w-md w-full border-2 border-rose-200 animate-modalAppear">
                 <div className="text-center mb-6">
-                  <div className="text-6xl mb-4">📞</div>
-                  <h3 className="text-2xl font-serif text-rose-900 mb-2">Our Call Sign</h3>
+                  <h3 className="text-2xl font-serif text-rose-900 mb-2">Our CS</h3>
                   <p className="text-rose-700/80" style={{ fontFamily: 'Georgia, serif' }}>
                     What did we call each other?
                   </p>
@@ -704,9 +703,9 @@ export default function LoveLetter() {
           <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 max-w-md w-full border-2 border-rose-200 animate-modalAppear">
             <div className="text-center mb-6">
               <div className="text-5xl mb-4">🔐</div>
-              <h2 className="text-2xl font-serif text-amber-900 mb-2">Enter Password</h2>
+              <h2 className="text-2xl font-serif text-amber-900 mb-2">Enter our Password</h2>
               <p className="text-amber-800/80" style={{ fontFamily: 'Georgia, serif' }}>
-                Enter the password to unlock the letter
+                Enter our password to unlock the letter
               </p>
             </div>
 
