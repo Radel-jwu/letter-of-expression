@@ -28,6 +28,7 @@ export default function LoveLetter() {
   const [typedMessage, setTypedMessage] = useState('');
   const [showLoadingAnimation, setShowLoadingAnimation] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [showFrontPage, setShowFrontPage] = useState(true);
 
   const CORRECT_PASSWORD = "bem";
 
@@ -56,7 +57,7 @@ export default function LoveLetter() {
       question: "What did I do immaturely to see your reaction?",
       options: [
         "I ignored your messages",
-        "I didn't contact you",
+        "I didn't contacted you",
         "I pretended to be busy",
         "I cancelled our plans"
       ],
@@ -159,18 +160,39 @@ export default function LoveLetter() {
 
   useEffect(() => {
     if (showLoadingAnimation) {
-      const message = "This will be my biggest letter of appreciation for you.";
-      let index = 0;
-      // Typing at 50ms per character, will complete in ~2.85 seconds (57 chars * 50ms)
-      const typingInterval = setInterval(() => {
-        if (index <= message.length) {
-          setLoadingTypedMessage(message.slice(0, index));
-          index++;
-        } else {
-          clearInterval(typingInterval);
+      const messages = [
+        "This will be my biggest letter of appreciation for you.",
+        "Hope you like it.",
+        "Almost There...",
+        "Ready?",
+        "Thank you for waiting..."
+      ];
+      let messageIndex = 0;
+      let charIndex = 0;
+      
+      const typeNextMessage = () => {
+        if (messageIndex >= messages.length) {
+          return;
         }
-      }, 50); // Fast typing - completes before loading finishes
-      return () => clearInterval(typingInterval);
+        
+        const currentMessage = messages[messageIndex];
+        const typingInterval = setInterval(() => {
+          if (charIndex <= currentMessage.length) {
+            setLoadingTypedMessage(currentMessage.slice(0, charIndex));
+            charIndex++;
+          } else {
+            clearInterval(typingInterval);
+            // Wait 1 second before showing next message
+            setTimeout(() => {
+              messageIndex++;
+              charIndex = 0;
+              typeNextMessage();
+            }, 1000);
+          }
+        }, 50);
+      };
+      
+      typeNextMessage();
     } else {
       setLoadingTypedMessage('');
     }
@@ -244,7 +266,6 @@ export default function LoveLetter() {
       setPassword('');
       setPasswordError('');
       
-      // Simulate loading progress over 10 seconds
       let progress = 0;
       const loadingInterval = setInterval(() => {
         progress += 1;
@@ -256,7 +277,7 @@ export default function LoveLetter() {
             setIsRevealed(true);
           }, 500);
         }
-      }, 100); // 100ms * 100 steps = 10 seconds
+      }, 100);
     } else {
       setPasswordError('Incorrect password. Try again! 💔');
       setPassword('');
@@ -312,8 +333,191 @@ export default function LoveLetter() {
 
     `As a result, it felt like you started to lose hope in us. You became inconsistent, and the worst part was that you never again allowed me to see the Gryzelle I experienced on the first day. You became distant—cold—and even though you still communicated, you felt far away. The Gryzelle I once knew felt like a dream I could never experience again.`,
 
-    ``
+    `I am truly sorry for what I have done, and I still feel responsible even now. I’ve made up my mind to fix my mistakes by changing. I’ve chosen to be resolute and never repeat the same mistakes again. I promised myself that I would understand you and never treat you immaturely again. Even so, if you no longer want to be with me, just say the word and I will leave. Above all else, I am eagerly waiting for the Gryzelle I knew and loved.`
   ];
+
+  // Front Page
+  if (showFrontPage) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-100 to-purple-100 animate-gradient-shift flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Floating hearts */}
+          {[...Array(25)].map((_, i) => (
+            <div
+              key={`heart-${i}`}
+              className="heart-float absolute text-rose-400/20"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 8}s`,
+                fontSize: `${Math.random() * 30 + 20}px`
+              }}
+            >
+              ♥
+            </div>
+          ))}
+          
+          {/* Sparkles */}
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={`sparkle-${i}`}
+              className="sparkle-twinkle absolute"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+              }}
+            >
+              ✨
+            </div>
+          ))}
+        </div>
+
+        {/* Main content */}
+        <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
+          {/* Animated envelope */}
+          <div className="mb-12 animate-floatGentle">
+            <div className="relative inline-block">
+              {/* Glow effect */}
+              <div className="absolute inset-0 blur-3xl bg-gradient-to-r from-rose-400 via-pink-400 to-purple-400 opacity-40 rounded-full scale-150"></div>
+              
+              {/* Envelope SVG */}
+              <svg viewBox="0 0 200 200" className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto relative z-10 drop-shadow-2xl">
+                {/* Envelope body */}
+                <defs>
+                  <linearGradient id="envelopeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#fef3c7" />
+                    <stop offset="100%" stopColor="#fde68a" />
+                  </linearGradient>
+                  <filter id="shadow">
+                    <feDropShadow dx="0" dy="4" stdDeviation="3" floodOpacity="0.3"/>
+                  </filter>
+                </defs>
+                
+                <rect x="20" y="60" width="160" height="100" fill="url(#envelopeGradient)" stroke="#d97706" strokeWidth="3" rx="4" filter="url(#shadow)"/>
+                
+                {/* Envelope flap (animated) */}
+                <polygon 
+                  points="100,80 20,60 180,60" 
+                  fill="#fbbf24" 
+                  stroke="#d97706" 
+                  strokeWidth="3"
+                  className="animate-pulse"
+                  style={{ transformOrigin: '100px 60px' }}
+                />
+                
+                {/* Heart emerging from envelope */}
+                <g className="animate-heartPulse">
+                  <path 
+                    d="M100,90 C100,90 85,75 78,75 C71,75 68,78 68,85 C68,92 73,100 100,120 C127,100 132,92 132,85 C132,78 129,75 122,75 C115,75 100,90 100,90 Z" 
+                    fill="#ef4444"
+                    filter="url(#shadow)"
+                  />
+                  {/* Heart shine */}
+                  <ellipse cx="90" cy="82" rx="8" ry="10" fill="#fca5a5" opacity="0.6"/>
+                </g>
+                
+                {/* Decorative stamp */}
+                <circle cx="160" cy="140" r="12" fill="#dc2626" opacity="0.8"/>
+                <text x="160" y="145" fontSize="10" fill="white" textAnchor="middle" fontWeight="bold">♥</text>
+              </svg>
+            </div>
+          </div>
+
+          {/* Title with typing effect appearance */}
+          <div className="mb-8 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif mb-4 bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 bg-clip-text text-transparent drop-shadow-lg">
+              A Letter For You
+            </h1>
+          </div>
+
+          {/* Subtitle */}
+          <div className="mb-12 animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+            <p className="text-base sm:text-lg text-rose-700/80 max-w-2xl mx-auto leading-relaxed px-4" style={{ fontFamily: 'Georgia, serif' }}>
+              I've prepared something special for you this Valentine's Day. 
+              A journey through our memories, leading to a heartfelt message.
+            </p>
+          </div>
+
+          {/* Decorative divider */}
+          <div className="flex items-center justify-center gap-4 mb-12 animate-fadeInUp" style={{ animationDelay: '0.9s' }}>
+            <div className="h-px w-20 bg-gradient-to-r from-transparent to-rose-300"></div>
+            <span className="text-2xl text-rose-400">❤</span>
+            <div className="h-px w-20 bg-gradient-to-l from-transparent to-rose-300"></div>
+          </div>
+
+          {/* Call to action */}
+          <div className="animate-fadeInUp" style={{ animationDelay: '1.2s' }}>
+            <p className="text-sm sm:text-base text-rose-600/70 mb-6 italic" style={{ fontFamily: 'Georgia, serif' }}>
+              Are you ready to begin?
+            </p>
+            
+            <button
+              onClick={() => setShowFrontPage(false)}
+              className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500 text-white px-10 sm:px-12 py-4 sm:py-5 rounded-full text-lg sm:text-xl font-medium shadow-2xl hover:shadow-rose-400/50 transition-all duration-500 transform hover:scale-105 active:scale-95 overflow-hidden"
+              style={{
+                backgroundSize: '200% 100%',
+              }}
+            >
+              {/* Animated shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+              
+              <span className="relative z-10 flex items-center gap-3">
+                <span>Open Your Letter</span>
+                <span className="text-2xl group-hover:animate-bounce">💖</span>
+              </span>
+              
+              {/* Sparkle effects on hover */}
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-300 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping"></div>
+              <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-pink-300 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style={{ animationDelay: '0.2s' }}></div>
+            </button>
+
+            {/* Subtle instruction */}
+            <p className="text-xs sm:text-sm text-rose-500/60 mt-6 italic animate-pulse" style={{ fontFamily: 'Georgia, serif' }}>
+              Click above to continue...
+            </p>
+          </div>
+
+          {/* Bottom decorative elements */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 opacity-40">
+            <div className="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></div>
+            <div className="w-2 h-2 rounded-full bg-pink-400 animate-pulse" style={{ animationDelay: '0.3s' }}></div>
+            <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '0.6s' }}></div>
+          </div>
+        </div>
+
+        <style jsx>{`
+          @keyframes heartPulse {
+            0%, 100% {
+              transform: scale(1);
+            }
+            50% {
+              transform: scale(1.1);
+            }
+          }
+
+          @keyframes sparkleTwinkle {
+            0%, 100% {
+              opacity: 0;
+              transform: scale(0) rotate(0deg);
+            }
+            50% {
+              opacity: 1;
+              transform: scale(1) rotate(180deg);
+            }
+          }
+
+          .animate-heartPulse {
+            animation: heartPulse 2s ease-in-out infinite;
+          }
+
+          .sparkle-twinkle {
+            animation: sparkleTwinkle 3s ease-in-out infinite;
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   // Verification Screen
   if (!verificationComplete) {
