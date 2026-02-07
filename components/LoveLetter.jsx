@@ -333,7 +333,7 @@ export default function LoveLetter() {
 
     `As a result, it felt like you started to lose hope in us. You became inconsistent, and the worst part was that you never again allowed me to see the Gryzelle I experienced on the first day. You became distant—cold—and even though you still communicated, you felt far away. The Gryzelle I once knew felt like a dream I could never experience again.`,
 
-    `I am truly sorry for what I have done, and I still feel responsible even now. I’ve made up my mind to fix my mistakes by changing. I’ve chosen to be resolute and never repeat the same mistakes again. I promised myself that I would understand you and never treat you immaturely again. Even so, if you no longer want to be with me, just say the word and I will leave. Above all else, I am eagerly waiting for the Gryzelle I knew and loved.`
+    `I am truly sorry for what I have done, and I still feel responsible even now. I’ve made up my mind to fix my mistakes by changing. I’ve chosen to be resolute and never repeat the same mistakes again. I promised myself that I would understand you and never treat you immaturely again. Even so, if you no longer want to be with me, just say the word and I will leave. Above all else, I am eagerly waiting for the Gryzelle I knew and loved, forever and always.`
   ];
 
   // Front Page
@@ -1248,14 +1248,15 @@ export default function LoveLetter() {
                     isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
                   }`}>
                     <p className="text-amber-900/80 mb-6 sm:mb-8 text-sm sm:text-base" style={{ fontFamily: 'Georgia, serif' }}>
-                      Forever and always,
+                      With all my love,
                     </p>
                     <div className="text-2xl sm:text-3xl md:text-4xl" style={{ 
                       fontFamily: "'Brush Script MT', cursive",
                       color: '#8B4513'
                     }}>
-                      With all my love, Ry
+                      Del
                     </div>
+                    
 
                     {/* Closing Seal Button */}
                     {!showClosingAnimation && !showFinalMessage && (
