@@ -26,6 +26,8 @@ export default function LoveLetter() {
   const [showClosingAnimation, setShowClosingAnimation] = useState(false);
   const [showFinalMessage, setShowFinalMessage] = useState(false);
   const [typedMessage, setTypedMessage] = useState('');
+  const [showLoadingAnimation, setShowLoadingAnimation] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   const CORRECT_PASSWORD = "bem";
 
@@ -139,7 +141,7 @@ export default function LoveLetter() {
 
   useEffect(() => {
     if (showFinalMessage) {
-      const message = "Salamat Gryzelle ug pag amping pirmi and Happy Hearts day!";
+      const message = "Salamat Gryzelle!!, pag amping pirmi ug Happy Hearts day!";
       let index = 0;
       const typingInterval = setInterval(() => {
         if (index <= message.length) {
@@ -152,6 +154,27 @@ export default function LoveLetter() {
       return () => clearInterval(typingInterval);
     }
   }, [showFinalMessage]);
+
+  const [loadingTypedMessage, setLoadingTypedMessage] = useState('');
+
+  useEffect(() => {
+    if (showLoadingAnimation) {
+      const message = "This will be my biggest letter of appreciation for you.";
+      let index = 0;
+      // Typing at 50ms per character, will complete in ~2.85 seconds (57 chars * 50ms)
+      const typingInterval = setInterval(() => {
+        if (index <= message.length) {
+          setLoadingTypedMessage(message.slice(0, index));
+          index++;
+        } else {
+          clearInterval(typingInterval);
+        }
+      }, 50); // Fast typing - completes before loading finishes
+      return () => clearInterval(typingInterval);
+    } else {
+      setLoadingTypedMessage('');
+    }
+  }, [showLoadingAnimation]);
 
   const moveNoButton = () => {
     setIsNoButtonDodging(true);
@@ -169,7 +192,6 @@ export default function LoveLetter() {
       setShowRatingModal(false);
       setVerificationStep(1);
     } else {
-      // Shake animation for wrong rating
       const modal = document.querySelector('.rating-modal');
       modal.classList.add('animate-shake');
       setTimeout(() => modal.classList.remove('animate-shake'), 400);
@@ -217,10 +239,24 @@ export default function LoveLetter() {
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
     if (password.toLowerCase() === CORRECT_PASSWORD.toLowerCase()) {
-      setIsRevealed(true);
       setShowPasswordModal(false);
+      setShowLoadingAnimation(true);
       setPassword('');
       setPasswordError('');
+      
+      // Simulate loading progress over 10 seconds
+      let progress = 0;
+      const loadingInterval = setInterval(() => {
+        progress += 1;
+        setLoadingProgress(progress);
+        if (progress >= 100) {
+          clearInterval(loadingInterval);
+          setTimeout(() => {
+            setShowLoadingAnimation(false);
+            setIsRevealed(true);
+          }, 500);
+        }
+      }, 100); // 100ms * 100 steps = 10 seconds
     } else {
       setPasswordError('Incorrect password. Try again! 💔');
       setPassword('');
@@ -256,30 +292,33 @@ export default function LoveLetter() {
 
   const getVisibleParagraphs = () => {
     const percentage = getScorePercentage();
-    if (percentage === 100) return 5;
-    if (percentage >= 80) return 4;
-    if (percentage >= 60) return 3;
-    if (percentage >= 40) return 2;
-    if (percentage >= 20) return 1;
+    if (percentage === 100) return 6;
+    if (percentage >= 90) return 5;
+    if (percentage >= 70) return 4;
+    if (percentage >= 50) return 3;
+    if (percentage >= 30) return 2;
+    if (percentage >= 10) return 1;
     return 0;
   };
 
   const paragraphs = [
-    `My heart still holds every precious moment from our first day together, the laughter, joy, conflicts, and even the contradictions. I remember when we talked all day long; we were so happy that day, and I can still remember the feeling even until now. I also remember when I immaturely didn't contact you just to see your reaction, and I still remember your reaction enough HAHA.`,
-    
-    `The ML we played though was the hilarious one. Remember the time when we played just to lose, katung na LS ta? You said, "Pahuway sa ta bem kay na stress na ko HAHAHAHAHAH." You always reacted also if I have another woman to play with, I can truly feel your consistency that day. You also have a spirit to help others, you are politically aware which I am not, we even have a contradicted opinion about politics, but you still patiently listened to me despite your conflicting beliefs towards the politician I voted and still respected my beliefs despite our differences. I really admire that about you. The best one is the tender kindness you expressed to me by expressing to me that I am enough and would surely be accepted by your relatives. It felt really good.`,
-    
-    `It felt like you started to trust me by sharing all of your past experiences: the breakups (your past relationships), your parents, especially your father, whom you loved. But at that time, I was so immature to the point that I didn't handle you maturely. I became a boy instead of a man you could rely on. I was selfish instead of caring, and I was distant instead of close.`,
-    
-    `As a result, it felt like you started to lose hope in us and started to act inconsistent and the worst part was that you never once again allowed me to see the Gryzelle I experienced on the first day. You became insanely distant, cold, and for somehow you still communicated, but still distant. The Gryzelle I once knew almost felt like a dream I could never experience again.`,
-    
-    `I am truly sorry for what I have done, and I really feel responsible even until now. I've made up my mind to resolve the fault by changing. I've decided to have resolve and never again commit the same mistake. I promised myself to understand you and never again deal with you immaturely. Even so, if you don't want to be with me, just say the word and I will leave. Above all else, I am eagerly waiting for the Gryzelle I knew and loved.`
+    `My heart still holds every precious moment from our first day together—the laughter, joy, conflicts, and even the contradictions. I remember when we talked all day long; we were so happy that day, and I can still remember that feeling even now. I also remember when I immaturely didn’t contact you just to see your reaction, and I still remember your reaction clearly—HAHA.`,
+
+    `The ML games we played were hilarious. Remember the time we kept losing—katung na LS ta? You said, “Pahuway sa ta bem kay na stress na ko HAHAHAHAHAH.” You always reacted whenever I played with another woman, even if it was just a random person, and that really made me feel how much you cared. I could truly feel your consistency back then, when everything between us was still okay.`,
+
+    `You also have a strong spirit to help others. You are politically aware, which I am not. Even though we had opposing opinions about politics, you still patiently listened to me despite your conflicting beliefs about the politician I voted for. You respected my beliefs despite our differences, and I really admire that about you. The best part was the tender kindness you showed me—telling me that I was enough and that I would surely be accepted by your relatives. That made me feel really good.`,
+
+    `It felt like you started to trust me when you shared your past experiences—your breakups, your parents, especially your father, whom you loved deeply. But at that time, I was too immature. I didn’t handle you the way I should have. I became a boy instead of a man you could rely on. I was selfish instead of caring, and distant instead of close.`,
+
+    `As a result, it felt like you started to lose hope in us. You became inconsistent, and the worst part was that you never again allowed me to see the Gryzelle I experienced on the first day. You became distant—cold—and even though you still communicated, you felt far away. The Gryzelle I once knew felt like a dream I could never experience again.`,
+
+    ``
   ];
 
   // Verification Screen
   if (!verificationComplete) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-rose-100 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-rose-100 animate-gradient-shift flex items-center justify-center p-3 sm:p-4 relative overflow-hidden">
         {/* Floating hearts background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(20)].map((_, i) => (
@@ -297,39 +336,39 @@ export default function LoveLetter() {
           ))}
         </div>
 
-        <div className="max-w-lg w-full bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 md:p-12 border-2 border-rose-200 animate-fadeInUp relative z-10">
-          <div className="text-center mb-8">
-            <div className="text-7xl mb-4 animate-bounce">💝</div>
-            <h1 className="text-4xl font-serif text-rose-900 mb-3">Verification</h1>
-            <p className="text-rose-700/80" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="max-w-lg w-full bg-white/90 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 border-2 border-rose-200 animate-fadeInUp relative z-10">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="text-5xl sm:text-6xl md:text-7xl mb-3 sm:mb-4 animate-bounce">💝</div>
+            <h1 className="text-3xl sm:text-4xl font-serif text-rose-900 mb-2 sm:mb-3">Verification</h1>
+            <p className="text-sm sm:text-base text-rose-700/80" style={{ fontFamily: 'Georgia, serif' }}>
               Before we begin, I need to verify if this is really you...
             </p>
           </div>
 
           {/* Progress indicator */}
-          <div className="flex justify-center gap-2 mb-8">
-            <div className={`w-3 h-3 rounded-full transition-all duration-300 ${verificationStep >= 0 ? 'bg-rose-500' : 'bg-rose-200'}`}></div>
-            <div className={`w-3 h-3 rounded-full transition-all duration-300 ${verificationStep >= 1 ? 'bg-rose-500' : 'bg-rose-200'}`}></div>
-            <div className={`w-3 h-3 rounded-full transition-all duration-300 ${verificationStep >= 2 ? 'bg-rose-500' : 'bg-rose-200'}`}></div>
+          <div className="flex justify-center gap-2 mb-6 sm:mb-8">
+            <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${verificationStep >= 0 ? 'bg-rose-500' : 'bg-rose-200'}`}></div>
+            <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${verificationStep >= 1 ? 'bg-rose-500' : 'bg-rose-200'}`}></div>
+            <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${verificationStep >= 2 ? 'bg-rose-500' : 'bg-rose-200'}`}></div>
           </div>
 
           {/* Question 1: Am I handsome? */}
           {verificationStep === 0 && (
             <div className="text-center animate-fadeIn">
-              <h2 className="text-2xl font-serif text-rose-900 mb-8">
-                Am I handsome to you (hi gwapo)?
+              <h2 className="text-xl sm:text-2xl font-serif text-rose-900 mb-6 sm:mb-8 px-2">
+                Am I handsome to you (hi gwapa)?
               </h2>
-              <div className="flex gap-4 justify-center relative" style={{ minHeight: '60px' }}>
+              <div className="flex gap-3 sm:gap-4 justify-center relative" style={{ minHeight: '60px' }}>
                 <button
                   onClick={handleQuestion1Yes}
-                  className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-3 rounded-full font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95"
+                  className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95"
                 >
                   Yes! 😍
                 </button>
                 <button
                   onMouseEnter={moveNoButton}
                   onClick={moveNoButton}
-                  className={`bg-gray-300 text-gray-700 px-8 py-3 rounded-full font-medium transition-all duration-200 ${
+                  className={`bg-gray-300 text-gray-700 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-200 ${
                     isNoButtonDodging ? 'absolute' : ''
                   }`}
                   style={isNoButtonDodging ? {
@@ -345,21 +384,21 @@ export default function LoveLetter() {
 
           {/* Rating Modal */}
           {showRatingModal && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-              <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 max-w-md w-full border-2 border-rose-200 rating-modal">
-                <div className="text-center mb-6">
-                  <div className="text-6xl mb-4">⭐</div>
-                  <h3 className="text-2xl font-serif text-rose-900 mb-2">Rate Me!</h3>
-                  <p className="text-rose-700/80" style={{ fontFamily: 'Georgia, serif' }}>
-                    From 1 to 10, unsa ko ka gwapo?
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 animate-fadeIn">
+              <div className="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 max-w-md w-full border-2 border-rose-200 rating-modal">
+                <div className="text-center mb-4 sm:mb-6">
+                  <div className="text-5xl sm:text-6xl mb-3 sm:mb-4">⭐</div>
+                  <h3 className="text-xl sm:text-2xl font-serif text-rose-900 mb-2">Rate Me!</h3>
+                  <p className="text-sm sm:text-base text-rose-700/80" style={{ fontFamily: 'Georgia, serif' }}>
+                    On a scale of 1 to 10, unsa ko ka gwapo?
                   </p>
                 </div>
-                <div className="grid grid-cols-5 gap-3">
+                <div className="grid grid-cols-5 gap-2 sm:gap-3">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                     <button
                       key={num}
                       onClick={() => handleRating(num)}
-                      className={`aspect-square rounded-xl font-bold text-lg transition-all duration-200 ${
+                      className={`aspect-square rounded-lg sm:rounded-xl font-bold text-base sm:text-lg transition-all duration-200 ${
                         num === 10
                           ? 'bg-gradient-to-br from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 shadow-lg hover:scale-110'
                           : 'bg-rose-100 text-rose-700 hover:bg-rose-200 hover:scale-105'
@@ -376,20 +415,20 @@ export default function LoveLetter() {
           {/* Question 2: Do you love me? */}
           {verificationStep === 1 && (
             <div className="text-center animate-fadeIn">
-              <h2 className="text-2xl font-serif text-rose-900 mb-8">
+              <h2 className="text-xl sm:text-2xl font-serif text-rose-900 mb-6 sm:mb-8 px-2">
                 Do you love me?
               </h2>
-              <div className="flex gap-4 justify-center relative" style={{ minHeight: '60px' }}>
+              <div className="flex gap-3 sm:gap-4 justify-center relative" style={{ minHeight: '60px' }}>
                 <button
                   onClick={handleQuestion2Yes}
-                  className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-3 rounded-full font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95"
+                  className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95"
                 >
                   Yes! ❤️
                 </button>
                 <button
                   onMouseEnter={moveNoButton}
                   onClick={moveNoButton}
-                  className={`bg-gray-300 text-gray-700 px-8 py-3 rounded-full font-medium transition-all duration-200 ${
+                  className={`bg-gray-300 text-gray-700 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-200 ${
                     isNoButtonDodging ? 'absolute' : ''
                   }`}
                   style={isNoButtonDodging ? {
@@ -406,12 +445,12 @@ export default function LoveLetter() {
           {/* Question 3: Call sign */}
           {verificationStep === 2 && !showCallSignModal && (
             <div className="text-center animate-fadeIn">
-              <h2 className="text-2xl font-serif text-rose-900 mb-8">
+              <h2 className="text-xl sm:text-2xl font-serif text-rose-900 mb-6 sm:mb-8 px-2">
                 What's our call sign back then?
               </h2>
               <button
                 onClick={() => setShowCallSignModal(true)}
-                className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-3 rounded-full font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95"
+                className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95"
               >
                 Enter Call Sign
               </button>
@@ -420,11 +459,11 @@ export default function LoveLetter() {
 
           {/* Call Sign Modal */}
           {showCallSignModal && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-              <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 max-w-md w-full border-2 border-rose-200 animate-modalAppear">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-serif text-rose-900 mb-2">Our CS</h3>
-                  <p className="text-rose-700/80" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 animate-fadeIn">
+              <div className="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 max-w-md w-full border-2 border-rose-200 animate-modalAppear">
+                <div className="text-center mb-4 sm:mb-6">
+                  <h3 className="text-xl sm:text-2xl font-serif text-rose-900 mb-2">Our CS</h3>
+                  <p className="text-sm sm:text-base text-rose-700/80" style={{ fontFamily: 'Georgia, serif' }}>
                     What did we call each other?
                   </p>
                 </div>
@@ -438,18 +477,18 @@ export default function LoveLetter() {
                       setCallSignError('');
                     }}
                     placeholder="Enter call sign..."
-                    className="w-full px-4 py-3 border-2 border-rose-200 rounded-xl focus:outline-none focus:border-rose-500 mb-4 text-center text-lg bg-white/80 backdrop-blur-sm"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-rose-200 rounded-xl focus:outline-none focus:border-rose-500 mb-4 text-center text-base sm:text-lg bg-white/80 backdrop-blur-sm"
                     style={{ fontFamily: 'Georgia, serif' }}
                     autoFocus
                   />
 
                   {callSignError && (
-                    <div className="bg-red-50 border-2 border-red-300 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm animate-shake" style={{ fontFamily: 'Georgia, serif' }}>
+                    <div className="bg-red-50 border-2 border-red-300 text-red-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl mb-4 text-xs sm:text-sm animate-shake" style={{ fontFamily: 'Georgia, serif' }}>
                       {callSignError}
                     </div>
                   )}
 
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 sm:gap-3">
                     <button
                       type="button"
                       onClick={() => {
@@ -457,14 +496,14 @@ export default function LoveLetter() {
                         setCallSignError('');
                         setCallSign('');
                       }}
-                      className="flex-1 bg-rose-100 text-rose-900 px-6 py-3 rounded-xl font-medium hover:bg-rose-200 transition-all duration-300 border-2 border-rose-200"
+                      className="flex-1 bg-rose-100 text-rose-900 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-medium hover:bg-rose-200 transition-all duration-300 border-2 border-rose-200"
                       style={{ fontFamily: 'Georgia, serif' }}
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 py-3 rounded-xl font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                      className="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
                       style={{ fontFamily: 'Georgia, serif' }}
                     >
                       Submit
@@ -477,8 +516,8 @@ export default function LoveLetter() {
 
           {/* Congratulations Modal */}
           {showCongratsModal && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
-              <div className="bg-gradient-to-br from-white via-rose-50 to-pink-50 backdrop-blur-md rounded-3xl shadow-2xl p-8 md:p-12 max-w-lg w-full border-2 border-rose-300 animate-modalAppear relative overflow-hidden">
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-4 animate-fadeIn">
+              <div className="bg-gradient-to-br from-white via-rose-50 to-pink-50 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 max-w-lg w-full border-2 border-rose-300 animate-modalAppear relative overflow-hidden">
                 {/* Confetti background effect */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                   {[...Array(30)].map((_, i) => (
@@ -497,26 +536,26 @@ export default function LoveLetter() {
                 </div>
 
                 <div className="text-center relative z-10">
-                  <div className="text-8xl mb-6 animate-bounce">🎉</div>
-                  <h2 className="text-4xl font-serif text-rose-900 mb-4 animate-fadeInUp">
+                  <div className="text-6xl sm:text-7xl md:text-8xl mb-4 sm:mb-6 animate-bounce">🎉</div>
+                  <h2 className="text-3xl sm:text-4xl font-serif text-rose-900 mb-3 sm:mb-4 animate-fadeInUp">
                     Congratulations!
                   </h2>
-                  <div className="bg-white/80 backdrop-blur-sm border-2 border-rose-300 rounded-2xl p-6 mb-6 shadow-lg animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-                    <p className="text-rose-800 text-lg mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+                  <div className="bg-white/80 backdrop-blur-sm border-2 border-rose-300 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 shadow-lg animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+                    <p className="text-rose-800 text-base sm:text-lg mb-2 sm:mb-3" style={{ fontFamily: 'Georgia, serif' }}>
                       Verification Complete ✓
                     </p>
-                    <p className="text-2xl font-bold text-rose-600 mb-2">
-                      You are
+                    <p className="text-xl sm:text-2xl font-bold text-rose-600 mb-1 sm:mb-2">
+                      You are indeed
                     </p>
-                    <h3 className="text-3xl font-serif text-rose-900 mb-1" style={{
+                    <h3 className="text-2xl sm:text-3xl font-serif text-rose-900 mb-1 break-words" style={{
                       textShadow: '2px 2px 4px rgba(139, 69, 19, 0.1)'
                     }}>
                       Gryzelle Marie Arias
                     </h3>
-                    <div className="flex justify-center gap-2 mt-4">
-                      <span className="text-rose-400 text-2xl animate-pulse">♥</span>
-                      <span className="text-rose-500 text-3xl animate-pulse" style={{ animationDelay: '0.2s' }}>♥</span>
-                      <span className="text-rose-400 text-2xl animate-pulse" style={{ animationDelay: '0.4s' }}>♥</span>
+                    <div className="flex justify-center gap-2 mt-3 sm:mt-4">
+                      <span className="text-rose-400 text-xl sm:text-2xl animate-pulse">♥</span>
+                      <span className="text-rose-500 text-2xl sm:text-3xl animate-pulse" style={{ animationDelay: '0.2s' }}>♥</span>
+                      <span className="text-rose-400 text-xl sm:text-2xl animate-pulse" style={{ animationDelay: '0.4s' }}>♥</span>
                     </div>
                   </div>
                   
@@ -525,7 +564,7 @@ export default function LoveLetter() {
                       setShowCongratsModal(false);
                       setVerificationComplete(true);
                     }}
-                    className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-10 py-4 rounded-full font-medium text-lg hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                    className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full font-medium text-base sm:text-lg hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
                   >
                     Continue to Quiz 💌
                   </button>
@@ -541,28 +580,26 @@ export default function LoveLetter() {
   // Quiz Introduction
   if (!quizStarted && !quizCompleted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center border-2 border-rose-200 animate-fadeInUp">
-          <div className="text-6xl mb-6 animate-bounce">💌</div>
-          <h1 className="text-3xl font-serif text-amber-900 mb-4">A Letter Awaits</h1>
-          <p className="text-amber-800/80 mb-6 leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 animate-gradient-shift-slow flex items-center justify-center p-3 sm:p-4">
+        <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 text-center border-2 border-rose-200 animate-fadeInUp">
+          <div className="text-5xl sm:text-6xl mb-4 sm:mb-6 animate-bounce">💌</div>
+          <h1 className="text-2xl sm:text-3xl font-serif text-amber-900 mb-3 sm:mb-4">A Letter Awaits</h1>
+          <p className="text-sm sm:text-base text-amber-800/80 mb-4 sm:mb-6 leading-relaxed px-2" style={{ fontFamily: 'Georgia, serif' }}>
             Before you can read this special letter, please answer a few questions about our memories together. 
             Your score will determine how much of the letter you'll see.
           </p>
-          <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-rose-800 font-medium">Scoring Guide:</p>
-            <ul className="text-sm text-rose-700 mt-2 space-y-1">
-              <li>100% - See the complete letter ❤️</li>
-              <li>80-90% - See 4 paragraphs</li>
-              <li>60-70% - See 3 paragraphs</li>
-              <li>40-50% - See 2 paragraphs</li>
-              <li>20-30% - See 1 paragraph</li>
-              <li>Below 20% - See a glimpse</li>
-            </ul>
+          <div className="bg-rose-50 border border-rose-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            <p className="text-xs sm:text-sm text-rose-800 font-medium mb-2">Scoring Guide:</p>
+            <p className="text-xs sm:text-sm text-rose-800 font-medium mb-2"> 100% - See everything</p>
+            <p className="text-xs sm:text-sm text-rose-800 font-medium mb-2"> 80%+ - See 5 paragraphs</p>
+            <p className="text-xs sm:text-sm text-rose-800 font-medium mb-2"> 60%+ - See 4 paragraphs</p>
+            <p className="text-xs sm:text-sm text-rose-800 font-medium mb-2"> 40%+ - See 3 paragraphs</p>
+            <p className="text-xs sm:text-sm text-rose-800 font-medium mb-2"> 20%+ - See 2 paragraphs</p>
           </div>
+
           <button
             onClick={() => setQuizStarted(true)}
-            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-3 rounded-full font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 active:shadow-md"
+            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 active:shadow-md"
           >
             Start Quiz
           </button>
@@ -574,39 +611,39 @@ export default function LoveLetter() {
   // Quiz Questions
   if (quizStarted && !quizCompleted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border-2 border-rose-200 animate-fadeInUp">
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 animate-gradient-shift-slow flex items-center justify-center p-3 sm:p-4">
+        <div className="max-w-2xl w-full bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 md:p-8 border-2 border-rose-200 animate-fadeInUp">
           {/* Progress bar */}
-          <div className="mb-6">
-            <div className="flex justify-between text-sm text-amber-800 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <div className="flex justify-between text-xs sm:text-sm text-amber-800 mb-2">
               <span>Question {currentQuestion + 1} of {quiz.length}</span>
               <span>Score: {score}/{currentQuestion}</span>
             </div>
-            <div className="w-full bg-rose-100 rounded-full h-2">
+            <div className="w-full bg-rose-100 rounded-full h-1.5 sm:h-2">
               <div 
-                className="bg-gradient-to-r from-rose-500 to-pink-500 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-rose-500 to-pink-500 h-1.5 sm:h-2 rounded-full transition-all duration-300"
                 style={{ width: `${((currentQuestion + 1) / quiz.length) * 100}%` }}
               ></div>
             </div>
           </div>
 
           {/* Question */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-serif text-amber-900 mb-6">
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-serif text-amber-900 mb-4 sm:mb-6">
               {quiz[currentQuestion].question}
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {quiz[currentQuestion].options.map((option, index) => (
                 <button
                   key={index}
                   onClick={() => handleAnswerSelect(index)}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 transform active:scale-95 ${
+                  className={`w-full text-left p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 transform active:scale-95 ${
                     selectedAnswer === index
                       ? 'border-rose-500 bg-rose-50 shadow-md'
                       : 'border-amber-200 bg-white hover:border-rose-300 hover:bg-rose-25 hover:scale-[1.02]'
                   }`}
                 >
-                  <span className="text-amber-900" style={{ fontFamily: 'Georgia, serif' }}>
+                  <span className="text-sm sm:text-base text-amber-900" style={{ fontFamily: 'Georgia, serif' }}>
                     {option}
                   </span>
                 </button>
@@ -618,7 +655,7 @@ export default function LoveLetter() {
           <button
             onClick={handleNextQuestion}
             disabled={selectedAnswer === null}
-            className={`w-full py-3 rounded-full font-medium transition-all duration-300 transform ${
+            className={`w-full py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 transform ${
               selectedAnswer !== null
                 ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -636,36 +673,38 @@ export default function LoveLetter() {
     const percentage = getScorePercentage();
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-amber-50 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 md:p-12 text-center border-2 border-rose-200">
-          <div className="text-6xl mb-6">
+      <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-amber-50 animate-gradient-shift-slow flex items-center justify-center p-3 sm:p-4">
+        <div className="max-w-2xl w-full bg-white/90 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 md:p-12 text-center border-2 border-rose-200">
+          <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">
             {percentage === 100 ? '🎉' : percentage >= 80 ? '😊' : percentage >= 60 ? '🙂' : percentage >= 40 ? '💕' : '💔'}
           </div>
           
-          <h1 className="text-4xl font-serif text-amber-900 mb-4">Quiz Complete!</h1>
+          <h1 className="text-3xl sm:text-4xl font-serif text-amber-900 mb-3 sm:mb-4">Quiz Complete!</h1>
           
-          <div className="text-6xl font-bold text-rose-500 mb-2">{percentage}%</div>
-          <p className="text-amber-800 mb-6" style={{ fontFamily: 'Georgia, serif' }}>Your Score: {score} out of {quiz.length}</p>
+          <div className="text-5xl sm:text-6xl font-bold text-rose-500 mb-2">{percentage}%</div>
+          <p className="text-sm sm:text-base text-amber-800 mb-4 sm:mb-6" style={{ fontFamily: 'Georgia, serif' }}>Your Score: {score} out of {quiz.length}</p>
           
-          <div className="bg-rose-50 border border-rose-200 rounded-lg p-6 mb-8">
-            <p className="text-amber-900 text-lg" style={{ fontFamily: 'Georgia, serif' }}>
+          <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
+            <p className="text-sm sm:text-base md:text-lg text-amber-900 leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
               {percentage === 100
-                ? "Perfect! You remember everything! You'll see the complete letter (all 5 paragraphs). ❤️"
-                : percentage >= 80
-                ? `Great job! You'll see 4 out of 5 paragraphs of the letter.`
-                : percentage >= 60
-                ? `Good! You'll see 3 out of 5 paragraphs of the letter.`
-                : percentage >= 40
-                ? `Not bad! You'll see 2 out of 5 paragraphs of the letter.`
-                : percentage >= 20
-                ? `You'll see 1 out of 5 paragraphs of the letter.`
+                ? "Perfect! You remember everything! You'll see the complete letter (all 6 paragraphs). ❤️"
+                : percentage >= 90
+                ? `Amazing! You'll see 5 out of 6 paragraphs of the letter.`
+                : percentage >= 70
+                ? `Great job! You'll see 4 out of 6 paragraphs of the letter.`
+                : percentage >= 50
+                ? `Good! You'll see 3 out of 6 paragraphs of the letter.`
+                : percentage >= 30
+                ? `Not bad! You'll see 2 out of 6 paragraphs of the letter.`
+                : percentage >= 10
+                ? `You'll see 1 out of 6 paragraphs of the letter.`
                 : "You'll see just a glimpse. Try to remember our memories better! 💔"}
             </p>
           </div>
 
           <button
             onClick={() => setShowResult(false)}
-            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-3 rounded-full font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 active:shadow-md"
+            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 active:shadow-md"
           >
             Open Your Letter
           </button>
@@ -679,7 +718,7 @@ export default function LoveLetter() {
 
   // Letter Display
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 flex items-center justify-center p-4 overflow-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 animate-gradient-shift-slow flex items-center justify-center p-3 sm:p-4 md:p-6 lg:p-8 overflow-hidden relative">
       {/* Floating hearts background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(15)].map((_, i) => (
@@ -699,12 +738,12 @@ export default function LoveLetter() {
 
       {/* Password Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 max-w-md w-full border-2 border-rose-200 animate-modalAppear">
-            <div className="text-center mb-6">
-              <div className="text-5xl mb-4">🔐</div>
-              <h2 className="text-2xl font-serif text-amber-900 mb-2">Enter our Password</h2>
-              <p className="text-amber-800/80" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 animate-fadeIn">
+          <div className="bg-white/95 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full border-2 border-rose-200 animate-modalAppear">
+            <div className="text-center mb-4 sm:mb-6">
+              <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">🔐</div>
+              <h2 className="text-xl sm:text-2xl font-serif text-amber-900 mb-2">Enter our Password</h2>
+              <p className="text-sm sm:text-base text-amber-800/80" style={{ fontFamily: 'Georgia, serif' }}>
                 Enter our password to unlock the letter
               </p>
             </div>
@@ -718,29 +757,29 @@ export default function LoveLetter() {
                   setPasswordError('');
                 }}
                 placeholder="Enter password..."
-                className="w-full px-4 py-3 border-2 border-rose-200 rounded-lg focus:outline-none focus:border-rose-500 mb-4 text-center text-lg bg-white/80 backdrop-blur-sm"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-rose-200 rounded-lg focus:outline-none focus:border-rose-500 mb-4 text-center text-base sm:text-lg bg-white/80 backdrop-blur-sm"
                 style={{ fontFamily: 'Georgia, serif' }}
                 autoFocus
               />
 
               {passwordError && (
-                <div className="bg-red-50 border-2 border-red-300 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm animate-shake" style={{ fontFamily: 'Georgia, serif' }}>
+                <div className="bg-red-50 border-2 border-red-300 text-red-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg mb-4 text-xs sm:text-sm animate-shake" style={{ fontFamily: 'Georgia, serif' }}>
                   {passwordError}
                 </div>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="flex-1 bg-amber-100 text-amber-900 px-6 py-3 rounded-lg font-medium hover:bg-amber-200 transition-all duration-300 border-2 border-amber-200"
+                  className="flex-1 bg-amber-100 text-amber-900 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium hover:bg-amber-200 transition-all duration-300 border-2 border-amber-200"
                   style={{ fontFamily: 'Georgia, serif' }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                  className="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
                   style={{ fontFamily: 'Georgia, serif' }}
                 >
                   Unlock
@@ -751,8 +790,92 @@ export default function LoveLetter() {
         </div>
       )}
 
+      {/* Loading Animation Modal */}
+      {showLoadingAnimation && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-4 animate-fadeIn">
+          <div className="bg-gradient-to-br from-white via-rose-50 to-pink-50 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-2xl p-8 sm:p-10 md:p-12 max-w-lg w-full border-2 border-rose-300 animate-modalAppear relative overflow-hidden">
+            {/* Floating hearts in background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {[...Array(15)].map((_, i) => (
+                <div
+                  key={i}
+                  className="heart-float absolute text-rose-300/20"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 3}s`,
+                    fontSize: `${Math.random() * 20 + 10}px`
+                  }}
+                >
+                  ♥
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center relative z-10">
+              {/* Animated envelope opening */}
+              <div className="mb-6 sm:mb-8 relative">
+                <div className="inline-block animate-floatGentle">
+                  <svg viewBox="0 0 100 100" className="w-24 h-24 sm:w-32 sm:h-32 mx-auto">
+                    {/* Envelope body */}
+                    <rect x="10" y="35" width="80" height="50" fill="#fef3c7" stroke="#d97706" strokeWidth="2" rx="2"/>
+                    {/* Envelope flap opening animation */}
+                    <polygon 
+                      points="50,40 10,35 90,35" 
+                      fill="#fcd34d" 
+                      stroke="#d97706" 
+                      strokeWidth="2"
+                      className="animate-pulse"
+                    />
+                    {/* Heart emerging */}
+                    <path 
+                      d="M50,50 C50,50 42,43 38,43 C34,43 32,45 32,49 C32,53 35,57 50,67 C65,57 68,53 68,49 C68,45 66,43 62,43 C58,43 50,50 50,50 Z" 
+                      fill="#ef4444"
+                      className="animate-pulse"
+                      style={{ animationDelay: '0.3s' }}
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Typed message */}
+              <div className="mb-6 sm:mb-8">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-serif text-rose-900 mb-4 min-h-[80px] sm:min-h-[100px] leading-relaxed px-2">
+                  {loadingTypedMessage}
+                  <span className="animate-blink">|</span>
+                </h2>
+              </div>
+
+              {/* Progress bar */}
+              <div className="w-full bg-rose-200 rounded-full h-3 sm:h-4 mb-4 overflow-hidden">
+                <div 
+                  className="bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500 h-full rounded-full transition-all duration-300 animate-gradient-shift"
+                  style={{ 
+                    width: `${loadingProgress}%`,
+                    backgroundSize: '200% 100%'
+                  }}
+                >
+                  <div className="w-full h-full bg-white/20 animate-shimmer"></div>
+                </div>
+              </div>
+
+              {/* Loading percentage */}
+              <p className="text-rose-700 font-medium text-sm sm:text-base">
+                {loadingProgress}%
+              </p>
+
+              {/* Decorative hearts */}
+              <div className="flex justify-center gap-2 sm:gap-3 mt-6">
+                <span className="text-rose-400 text-2xl sm:text-3xl animate-pulse" style={{ animationDelay: '0s' }}>♥</span>
+                <span className="text-rose-500 text-3xl sm:text-4xl animate-pulse" style={{ animationDelay: '0.2s' }}>♥</span>
+                <span className="text-rose-400 text-2xl sm:text-3xl animate-pulse" style={{ animationDelay: '0.4s' }}>♥</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main letter container with enhanced entrance animation */}
-      <div className={`relative transition-all duration-1000 ease-out ${
+      <div className={`relative w-full max-w-[650px] mx-auto transition-all duration-1000 ease-out ${
         showContent 
           ? 'opacity-100 scale-100 translate-y-0 rotate-0' 
           : 'opacity-0 scale-75 translate-y-12 -rotate-3'
@@ -760,31 +883,37 @@ export default function LoveLetter() {
         {/* Wax seal */}
         {!isRevealed && (
           <div 
-            className="absolute -top-8 left-1/2 -translate-x-1/2 z-20 cursor-pointer group"
+            className="absolute -top-6 sm:-top-8 left-1/2 -translate-x-1/2 z-20 cursor-pointer group"
             onClick={handleSealClick}
           >
             <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-600 to-rose-800 shadow-xl flex items-center justify-center border-4 border-rose-900/30 group-hover:scale-110 group-active:scale-90 transition-transform duration-300">
-                <span className="text-rose-100 text-2xl font-serif">❤</span>
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-rose-600 via-rose-700 to-rose-900 shadow-xl flex items-center justify-center border-3 sm:border-4 border-rose-950/40 group-hover:scale-110 group-active:scale-90 transition-all duration-300 group-hover:shadow-2xl"
+                style={{
+                  boxShadow: '0 10px 30px -5px rgba(190, 18, 60, 0.6), 0 0 20px rgba(190, 18, 60, 0.3)'
+                }}
+              >
+                <span className="text-rose-100 text-xl sm:text-2xl font-serif drop-shadow-lg">❤</span>
               </div>
-              <div className="absolute inset-0 rounded-full bg-rose-600/30 blur-md animate-pulse"></div>
+              <div className="absolute inset-0 rounded-full bg-rose-600/40 blur-xl animate-pulse-slow"></div>
+              <div className="absolute inset-0 rounded-full bg-rose-400/20 blur-2xl animate-pulse"></div>
             </div>
           </div>
         )}
 
         {/* Letter envelope effect */}
         <div className={`transition-all duration-1000 ${isRevealed ? 'translate-y-0 opacity-0' : 'translate-y-0 opacity-100'}`}>
-          <div className="w-full h-8 bg-gradient-to-b from-amber-100 to-amber-200 border-b-2 border-amber-300"></div>
+          <div className="w-full h-6 sm:h-8 bg-gradient-to-b from-amber-100 to-amber-200 border-b-2 border-amber-300"></div>
         </div>
 
         {/* Letter paper */}
         <div 
-          className={`relative bg-gradient-to-br from-amber-50 to-yellow-50 shadow-2xl transition-all duration-1000 ${
+          className={`relative bg-gradient-to-br from-amber-50 to-yellow-50 shadow-2xl transition-all duration-1000 mx-auto rounded-sm ${
             isRevealed ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-70'
           }`}
           style={{
-            width: 'min(650px, 90vw)',
-            minHeight: '700px',
+            width: '100%',
+            maxWidth: '650px',
+            minHeight: '600px',
             backgroundImage: `
               repeating-linear-gradient(
                 0deg,
@@ -794,6 +923,11 @@ export default function LoveLetter() {
                 rgba(139, 92, 46, 0.03) 32px
               )
             `,
+            boxShadow: `
+              0 20px 60px -15px rgba(139, 69, 19, 0.3),
+              0 8px 20px -5px rgba(139, 69, 19, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.6)
+            `
           }}
         >
           {/* Paper texture overlay */}
@@ -805,36 +939,42 @@ export default function LoveLetter() {
           ></div>
 
           {/* Vintage border */}
-          <div className="absolute inset-4 border-2 border-amber-300/40 pointer-events-none"></div>
-          <div className="absolute inset-6 border border-amber-200/60 pointer-events-none"></div>
+          <div className="absolute inset-3 sm:inset-4 border-2 border-amber-300/40 pointer-events-none rounded-sm"></div>
+          <div className="absolute inset-4 sm:inset-6 border border-amber-200/60 pointer-events-none rounded-sm"></div>
+          
+          {/* Corner decorations */}
+          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 border-t-2 border-l-2 border-amber-400/50 pointer-events-none rounded-tl-sm"></div>
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 sm:w-10 sm:h-10 border-t-2 border-r-2 border-amber-400/50 pointer-events-none rounded-tr-sm"></div>
+          <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 border-b-2 border-l-2 border-amber-400/50 pointer-events-none rounded-bl-sm"></div>
+          <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 w-8 h-8 sm:w-10 sm:h-10 border-b-2 border-r-2 border-amber-400/50 pointer-events-none rounded-br-sm"></div>
 
           {/* Content - Only show if revealed */}
           {isRevealed ? (
             <>
               {/* Score badge */}
-              <div className="absolute top-4 right-4 bg-rose-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg animate-fadeIn">
+              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-rose-500 text-white rounded-full w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center shadow-lg animate-fadeIn">
                 <div className="text-center">
-                  <div className="text-xl font-bold">{percentage}%</div>
-                  <div className="text-xs">Score</div>
+                  <div className="text-base sm:text-xl font-bold">{percentage}%</div>
+                  <div className="text-[10px] sm:text-xs">Score</div>
                 </div>
               </div>
 
               {/* Content */}
-              <div className="relative p-12 md:p-16">
+              <div className="relative p-6 sm:p-8 md:p-12 lg:p-16">
                 {/* Date */}
-                <div className={`text-right mb-8 transition-all duration-700 delay-300 ${
+                <div className={`text-right mb-4 sm:mb-6 md:mb-8 transition-all duration-700 delay-300 ${
                   isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
                 }`}>
-                  <p className="text-amber-800/70 italic" style={{ fontFamily: 'Georgia, serif' }}>
+                  <p className="text-xs sm:text-sm text-amber-800/70 italic" style={{ fontFamily: 'Georgia, serif' }}>
                     February 6th, 2026
                   </p>
                 </div>
 
                 {/* Salutation */}
-                <div className={`mb-8 transition-all duration-700 delay-500 ${
+                <div className={`mb-4 sm:mb-6 md:mb-8 transition-all duration-700 delay-500 ${
                   isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
                 }`}>
-                  <h1 className="text-4xl md:text-5xl mb-2" style={{ 
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-2" style={{ 
                     fontFamily: "'Brush Script MT', cursive",
                     color: '#8B4513',
                     textShadow: '1px 1px 2px rgba(139, 69, 19, 0.1)'
@@ -844,14 +984,14 @@ export default function LoveLetter() {
                 </div>
 
                 {/* Letter body */}
-                <div className={`space-y-6 text-amber-900/90 leading-relaxed transition-all duration-700 delay-700 ${
+                <div className={`space-y-4 sm:space-y-5 md:space-y-6 text-amber-900/90 leading-relaxed transition-all duration-700 delay-700 ${
                   isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-                }`} style={{ fontFamily: 'Georgia, serif', fontSize: '17px' }}>
+                }`} style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(14px, 2.5vw, 17px)' }}>
                   {/* Visible paragraphs */}
                   {paragraphs.slice(0, visibleParagraphs).map((paragraph, index) => (
                     <p 
                       key={index}
-                      className={`text-justify ${index === 0 ? "first-letter:text-6xl first-letter:font-serif first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:text-rose-700" : ""}`}
+                      className={`text-justify ${index === 0 ? "first-letter:text-4xl sm:first-letter:text-5xl md:first-letter:text-6xl first-letter:font-serif first-letter:float-left first-letter:mr-2 first-letter:mt-1 first-letter:text-rose-700" : ""}`}
                     >
                       {paragraph}
                     </p>
@@ -863,30 +1003,31 @@ export default function LoveLetter() {
                       {/* Blurred locked paragraphs */}
                       <div className="blur-sm select-none pointer-events-none opacity-60">
                         {paragraphs.slice(visibleParagraphs).map((paragraph, index) => (
-                          <p key={`locked-${index}`} className="mb-6 text-justify">
+                          <p key={`locked-${index}`} className="mb-4 sm:mb-5 md:mb-6 text-justify">
                             {paragraph}
                           </p>
                         ))}
                       </div>
                       
                       {/* Overlay message */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="bg-amber-100/90 backdrop-blur-sm border-2 border-amber-300 rounded-lg p-6 text-center shadow-lg max-w-md">
-                          <div className="text-4xl mb-3">🔒</div>
-                          <p className="text-amber-800 font-semibold italic mb-2">
+                      <div className="absolute inset-0 flex items-center justify-center px-2">
+                        <div className="bg-amber-100/90 backdrop-blur-sm border-2 border-amber-300 rounded-lg p-4 sm:p-5 md:p-6 text-center shadow-lg max-w-md w-full">
+                          <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">🔒</div>
+                          <p className="text-amber-800 font-semibold italic mb-1 sm:mb-2 text-sm sm:text-base">
                             You've unlocked {visibleParagraphs} of {paragraphs.length} paragraphs
                           </p>
-                          <p className="text-amber-700 text-sm mb-4">
+                          <p className="text-amber-700 text-xs sm:text-sm mb-3 sm:mb-4">
                             Score {
-                              visibleParagraphs === 4 ? '100%' : 
-                              visibleParagraphs === 3 ? '80%+' : 
-                              visibleParagraphs === 2 ? '60%+' : 
-                              visibleParagraphs === 1 ? '40%+' : '20%+'
+                              visibleParagraphs === 5 ? '100%' : 
+                              visibleParagraphs === 4 ? '90%+' : 
+                              visibleParagraphs === 3 ? '70%+' : 
+                              visibleParagraphs === 2 ? '50%+' :
+                              visibleParagraphs === 1 ? '30%+' : '10%+'
                             } to see more... 💕
                           </p>
                           <button
                             onClick={handleRetakeQuiz}
-                            className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-2.5 rounded-full font-medium hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-sm"
+                            className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-full font-medium hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-xs sm:text-sm"
                             style={{ fontFamily: 'Georgia, serif' }}
                           >
                             Retake Quiz 🔄
@@ -899,13 +1040,13 @@ export default function LoveLetter() {
 
                 {/* Closing - only show if 100% */}
                 {percentage === 100 && (
-                  <div className={`mt-12 transition-all duration-700 delay-1000 ${
+                  <div className={`mt-8 sm:mt-10 md:mt-12 transition-all duration-700 delay-1000 ${
                     isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
                   }`}>
-                    <p className="text-amber-900/80 mb-8" style={{ fontFamily: 'Georgia, serif' }}>
+                    <p className="text-amber-900/80 mb-6 sm:mb-8 text-sm sm:text-base" style={{ fontFamily: 'Georgia, serif' }}>
                       Forever and always,
                     </p>
-                    <div className="text-4xl" style={{ 
+                    <div className="text-2xl sm:text-3xl md:text-4xl" style={{ 
                       fontFamily: "'Brush Script MT', cursive",
                       color: '#8B4513'
                     }}>
@@ -914,8 +1055,8 @@ export default function LoveLetter() {
 
                     {/* Closing Seal Button */}
                     {!showClosingAnimation && !showFinalMessage && (
-                      <div className="mt-16 text-center">
-                        <p className="text-amber-700/70 text-sm italic mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+                      <div className="mt-10 sm:mt-12 md:mt-16 text-center">
+                        <p className="text-amber-700/70 text-xs sm:text-sm italic mb-3 sm:mb-4" style={{ fontFamily: 'Georgia, serif' }}>
                           Click the seal to close the letter
                         </p>
                         <button
@@ -923,10 +1064,15 @@ export default function LoveLetter() {
                           className="group relative inline-block"
                         >
                           <div className="relative">
-                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-rose-600 to-rose-800 shadow-xl flex items-center justify-center border-4 border-rose-900/30 group-hover:scale-110 group-active:scale-90 transition-transform duration-300">
-                              <span className="text-rose-100 text-3xl">❤</span>
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-rose-600 via-rose-700 to-rose-900 shadow-xl flex items-center justify-center border-3 sm:border-4 border-rose-950/40 group-hover:scale-110 group-active:scale-90 transition-all duration-300 group-hover:shadow-2xl"
+                              style={{
+                                boxShadow: '0 10px 30px -5px rgba(190, 18, 60, 0.6), 0 0 20px rgba(190, 18, 60, 0.3)'
+                              }}
+                            >
+                              <span className="text-rose-100 text-2xl sm:text-3xl drop-shadow-lg">❤</span>
                             </div>
-                            <div className="absolute inset-0 rounded-full bg-rose-600/30 blur-md animate-pulse"></div>
+                            <div className="absolute inset-0 rounded-full bg-rose-600/40 blur-xl animate-pulse-slow"></div>
+                            <div className="absolute inset-0 rounded-full bg-rose-400/20 blur-2xl animate-pulse"></div>
                           </div>
                         </button>
                       </div>
@@ -936,25 +1082,25 @@ export default function LoveLetter() {
 
                 {/* Decorative hearts */}
                 {percentage === 100 && (
-                  <div className={`absolute bottom-8 right-8 flex gap-2 transition-all duration-700 delay-1200 ${
+                  <div className={`absolute bottom-6 right-6 sm:bottom-8 sm:right-8 flex gap-1.5 sm:gap-2 transition-all duration-700 delay-1200 ${
                     isRevealed ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
                   }`}>
-                    <span className="text-rose-400 text-2xl animate-pulse" style={{ animationDelay: '0s' }}>♥</span>
-                    <span className="text-rose-500 text-3xl animate-pulse" style={{ animationDelay: '0.2s' }}>♥</span>
-                    <span className="text-rose-400 text-2xl animate-pulse" style={{ animationDelay: '0.4s' }}>♥</span>
+                    <span className="text-rose-400 text-lg sm:text-xl md:text-2xl animate-pulse drop-shadow-lg" style={{ animationDelay: '0s' }}>♥</span>
+                    <span className="text-rose-500 text-xl sm:text-2xl md:text-3xl animate-pulse drop-shadow-lg" style={{ animationDelay: '0.2s' }}>♥</span>
+                    <span className="text-rose-400 text-lg sm:text-xl md:text-2xl animate-pulse drop-shadow-lg" style={{ animationDelay: '0.4s' }}>♥</span>
                   </div>
                 )}
               </div>
             </>
           ) : (
             /* Sealed letter preview */
-            <div className="relative flex items-center justify-center" style={{ minHeight: '700px' }}>
-              <div className="text-center">
-                <div className="text-8xl mb-6 animate-floatGentle">💌</div>
-                <p className="text-amber-800 text-2xl italic mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="relative flex items-center justify-center" style={{ minHeight: '600px' }}>
+              <div className="text-center px-4">
+                <div className="text-6xl sm:text-7xl md:text-8xl mb-4 sm:mb-6 animate-floatGentle">💌</div>
+                <p className="text-amber-800 text-xl sm:text-2xl italic mb-3 sm:mb-4" style={{ fontFamily: 'Georgia, serif' }}>
                   A special letter awaits you...
                 </p>
-                <p className="text-amber-600 italic" style={{ fontFamily: 'Georgia, serif' }}>
+                <p className="text-amber-600 italic text-sm sm:text-base" style={{ fontFamily: 'Georgia, serif' }}>
                   Click the heart seal above to unlock
                 </p>
               </div>
@@ -968,8 +1114,8 @@ export default function LoveLetter() {
 
       {/* Instructions */}
       {!isRevealed && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center animate-bounce">
-          <p className="text-rose-700/70 text-sm italic" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 text-center animate-bounce px-4">
+          <p className="text-rose-700/70 text-xs sm:text-sm italic" style={{ fontFamily: 'Georgia, serif' }}>
             Click the seal to open your letter
           </p>
         </div>
@@ -977,14 +1123,14 @@ export default function LoveLetter() {
 
       {/* Final Message Screen */}
       {showFinalMessage && (
-        <div className="fixed inset-0 bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
+        <div className="fixed inset-0 bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 animate-gradient-shift-slow flex items-center justify-center z-50 p-3 sm:p-4 animate-fadeIn">
           <div className="max-w-2xl w-full">
             {/* Letter envelope flap */}
             <div className="relative">
-              <div className="w-full bg-gradient-to-b from-amber-100 to-amber-200 border-b-2 border-amber-300 h-12 rounded-t-lg"></div>
+              <div className="w-full bg-gradient-to-b from-amber-100 to-amber-200 border-b-2 border-amber-300 h-8 sm:h-12 rounded-t-lg"></div>
               
               {/* Closed envelope */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-b-2xl shadow-2xl p-16 text-center border-2 border-rose-200 relative overflow-hidden">
+              <div className="bg-white/90 backdrop-blur-sm rounded-b-xl sm:rounded-b-2xl shadow-2xl p-8 sm:p-12 md:p-16 text-center border-2 border-rose-200 relative overflow-hidden">
                 {/* Paper texture */}
                 <div className="absolute inset-0 opacity-20 mix-blend-multiply pointer-events-none"
                   style={{
@@ -994,10 +1140,10 @@ export default function LoveLetter() {
                 ></div>
 
                 {/* Envelope icon */}
-                <div className="text-8xl mb-8 animate-floatGentle">
+                <div className="text-6xl sm:text-7xl md:text-8xl mb-6 sm:mb-8 animate-floatGentle">
                   <div className="relative inline-block">
                     <div className="absolute inset-0 blur-xl bg-rose-400/30 rounded-full"></div>
-                    <svg viewBox="0 0 100 100" className="w-32 h-32 mx-auto relative z-10">
+                    <svg viewBox="0 0 100 100" className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto relative z-10">
                       {/* Envelope body */}
                       <rect x="10" y="30" width="80" height="50" fill="#f3f4f6" stroke="#374151" strokeWidth="2" rx="2"/>
                       {/* Blue inner triangle */}
@@ -1013,25 +1159,25 @@ export default function LoveLetter() {
 
                 {/* Typed message */}
                 <div className="relative z-10">
-                  <h1 className="text-3xl md:text-4xl font-serif text-rose-900 mb-6 min-h-[120px] leading-relaxed">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif text-rose-900 mb-4 sm:mb-6 min-h-[100px] sm:min-h-[120px] leading-relaxed px-2">
                     {typedMessage}
                     <span className="animate-blink">|</span>
                   </h1>
                   
                   {/* Hearts decoration */}
-                  <div className="flex justify-center gap-3 mt-8">
-                    <span className="text-rose-400 text-3xl animate-pulse" style={{ animationDelay: '0s' }}>♥</span>
-                    <span className="text-rose-500 text-4xl animate-pulse" style={{ animationDelay: '0.2s' }}>♥</span>
-                    <span className="text-rose-400 text-3xl animate-pulse" style={{ animationDelay: '0.4s' }}>♥</span>
+                  <div className="flex justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
+                    <span className="text-rose-400 text-2xl sm:text-3xl animate-pulse" style={{ animationDelay: '0s' }}>♥</span>
+                    <span className="text-rose-500 text-3xl sm:text-4xl animate-pulse" style={{ animationDelay: '0.2s' }}>♥</span>
+                    <span className="text-rose-400 text-2xl sm:text-3xl animate-pulse" style={{ animationDelay: '0.4s' }}>♥</span>
                   </div>
                 </div>
               </div>
 
               {/* Wax seal at bottom */}
-              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 z-20">
+              <div className="absolute -bottom-5 sm:-bottom-6 left-1/2 -translate-x-1/2 z-20">
                 <div className="relative">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-600 to-rose-800 shadow-xl flex items-center justify-center border-4 border-rose-900/30">
-                    <span className="text-rose-100 text-2xl">❤</span>
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-rose-600 to-rose-800 shadow-xl flex items-center justify-center border-3 sm:border-4 border-rose-900/30">
+                    <span className="text-rose-100 text-xl sm:text-2xl">❤</span>
                   </div>
                   <div className="absolute inset-0 rounded-full bg-rose-600/30 blur-md animate-pulse"></div>
                 </div>
@@ -1135,6 +1281,33 @@ export default function LoveLetter() {
           }
         }
 
+        @keyframes gradientShift {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+
+        @keyframes pulseSlow {
+          0%, 100% {
+            opacity: 0.6;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+
         .heart-float {
           animation: heartFloat 15s infinite ease-in-out;
         }
@@ -1169,6 +1342,31 @@ export default function LoveLetter() {
 
         .animate-letterClose {
           animation: letterClose 2s ease-in-out forwards;
+        }
+
+        .animate-gradient-shift {
+          background-size: 200% 200%;
+          animation: gradientShift 8s ease infinite;
+        }
+
+        .animate-gradient-shift-slow {
+          background-size: 200% 200%;
+          animation: gradientShift 15s ease infinite;
+        }
+
+        .animate-pulse-slow {
+          animation: pulseSlow 3s ease-in-out infinite;
+        }
+
+        .animate-shimmer {
+          animation: shimmer 2s infinite;
+        }
+
+        /* Ensure touch targets are large enough on mobile */
+        @media (max-width: 640px) {
+          button {
+            min-height: 44px;
+          }
         }
       `}</style>
     </div>
