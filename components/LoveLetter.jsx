@@ -29,6 +29,9 @@ export default function LoveLetter() {
   const [showLoadingAnimation, setShowLoadingAnimation] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [showFrontPage, setShowFrontPage] = useState(true);
+  const [wrongAnswers, setWrongAnswers] = useState([]); // Track wrong answers
+  const [isRetakingWrong, setIsRetakingWrong] = useState(false); // Track if retaking wrong answers only
+  const [questionsToRetake, setQuestionsToRetake] = useState([]); // Questions to retake
 
   const CORRECT_PASSWORD = "bem";
 
@@ -241,11 +244,22 @@ export default function LoveLetter() {
   };
 
   const handleNextQuestion = () => {
-    if (selectedAnswer === quiz[currentQuestion].correct) {
+    const currentQuizIndex = isRetakingWrong 
+      ? questionsToRetake[currentQuestion] 
+      : currentQuestion;
+    
+    const isCorrect = selectedAnswer === quiz[currentQuizIndex].correct;
+    
+    if (isCorrect) {
       setScore(score + 1);
+    } else if (!isRetakingWrong) {
+      // Only track wrong answers during first attempt
+      setWrongAnswers(prev => [...prev, currentQuizIndex]);
     }
 
-    if (currentQuestion < quiz.length - 1) {
+    const totalQuestions = isRetakingWrong ? questionsToRetake.length : quiz.length;
+    
+    if (currentQuestion < totalQuestions - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
     } else {
@@ -305,6 +319,23 @@ export default function LoveLetter() {
     setSelectedAnswer(null);
     setShowResult(false);
     setIsRevealed(false);
+    setWrongAnswers([]);
+    setIsRetakingWrong(false);
+    setQuestionsToRetake([]);
+  };
+
+  const handleRetakeWrongOnly = () => {
+    if (wrongAnswers.length > 0) {
+      setQuestionsToRetake(wrongAnswers);
+      setQuizCompleted(false);
+      setQuizStarted(true);
+      setCurrentQuestion(0);
+      setScore(score); // Keep existing score
+      setSelectedAnswer(null);
+      setShowResult(false);
+      setIsRevealed(false);
+      setIsRetakingWrong(true);
+    }
   };
 
   const getScorePercentage = () => {
@@ -323,17 +354,17 @@ export default function LoveLetter() {
   };
 
   const paragraphs = [
-    `My heart still holds every precious moment from our first day together—the laughter, joy, conflicts, and even the contradictions. I remember when we talked all day long; we were so happy that day, and I can still remember that feeling even now. I also remember when I immaturely didn’t contact you just to see your reaction, and I still remember your reaction clearly—HAHA.`,
+    `My heart still holds every precious moment from our first day together—the laughter, joy, conflicts, and even the contradictions. I remember when we talked all day long; we were so happy that day, and I can still remember that feeling even now. I also remember when I immaturely didn't contact you just to see your reaction, and I still remember your reaction clearly—HAHA.`,
 
-    `The ML games we played were hilarious. Remember the time we kept losing—katung na LS ta? You said, “Pahuway sa ta bem kay na stress na ko HAHAHAHAHAH.” You always reacted whenever I played with another woman, even if it was just a random person, and that really made me feel how much you cared. I could truly feel your consistency back then, when everything between us was still okay.`,
+    `The ML games we played were hilarious. Remember the time we kept losing—katung na LS ta? You said, "Pahuway sa ta bem kay na stress na ko HAHAHAHAHAH." You always reacted whenever I played with another woman, even if it was just a random person, and that really made me feel how much you cared. I could truly feel your consistency back then, when everything between us was still okay.`,
 
     `You also have a strong spirit to help others. You are politically aware, which I am not. Even though we had opposing opinions about politics, you still patiently listened to me despite your conflicting beliefs about the politician I voted for. You respected my beliefs despite our differences, and I really admire that about you. The best part was the tender kindness you showed me—telling me that I was enough and that I would surely be accepted by your relatives. That made me feel really good.`,
 
-    `It felt like you started to trust me when you shared your past experiences—your breakups, your parents, especially your father, whom you loved deeply. But at that time, I was too immature. I didn’t handle you the way I should have. I became a boy instead of a man you could rely on. I was selfish instead of caring, and distant instead of close.`,
+    `It felt like you started to trust me when you shared your past experiences—your breakups, your parents, especially your father, whom you loved deeply. But at that time, I was too immature. I didn't handle you the way I should have. I became a boy instead of a man you could rely on. I was selfish instead of caring, and distant instead of close.`,
 
     `As a result, it felt like you started to lose hope in us. You became inconsistent, and the worst part was that you never again allowed me to see the Gryzelle I experienced on the first day. You became distant—cold—and even though you still communicated, you felt far away. The Gryzelle I once knew felt like a dream I could never experience again.`,
 
-    `I am truly sorry for what I have done, and I still feel responsible even now. I’ve made up my mind to fix my mistakes by changing. I’ve chosen to be resolute and never repeat the same mistakes again. I promised myself that I would understand you and never treat you immaturely again. Even so, if you no longer want to be with me, just say the word and I will leave. Above all else, I am eagerly waiting for the Gryzelle I knew and loved, forever and always.`
+    `I am truly sorry for what I have done, and I still feel responsible even now. I've made up my mind to fix my mistakes by changing. I've chosen to be resolute and never repeat the same mistakes again. I promised myself that I would understand you and never treat you immaturely again. Even so, if you no longer want to be with me, just say the word and I will respect that decision. After all it's all in me that we've come to this state and i will take this burden forever, but not to permanently froze my world, but to improve as an individual. But despite everything, bisag unsa paka ka maldita, dawatun ra tana tanan, after all kay ni settle gud kug maldita, though maldita nga worth it, since si Gryzelle Marie Arias nagud ni HAHA. Above all else, I am eagerly waiting for the Gryzelle I knew and loved, forever and always.`
   ];
 
   // Front Page
@@ -814,19 +845,25 @@ export default function LoveLetter() {
 
   // Quiz Questions
   if (quizStarted && !quizCompleted) {
+    const currentQuizIndex = isRetakingWrong ? questionsToRetake[currentQuestion] : currentQuestion;
+    const totalQuestions = isRetakingWrong ? questionsToRetake.length : quiz.length;
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-50 animate-gradient-shift-slow flex items-center justify-center p-3 sm:p-4">
         <div className="max-w-2xl w-full bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 md:p-8 border-2 border-rose-200 animate-fadeInUp">
           {/* Progress bar */}
           <div className="mb-4 sm:mb-6">
             <div className="flex justify-between text-xs sm:text-sm text-amber-800 mb-2">
-              <span>Question {currentQuestion + 1} of {quiz.length}</span>
-              <span>Score: {score}/{currentQuestion}</span>
+              <span>
+                {isRetakingWrong ? 'Retaking Wrong Answers: ' : 'Question '}
+                {currentQuestion + 1} of {totalQuestions}
+              </span>
+              <span>Total Score: {score}/{quiz.length}</span>
             </div>
             <div className="w-full bg-rose-100 rounded-full h-1.5 sm:h-2">
               <div 
                 className="bg-gradient-to-r from-rose-500 to-pink-500 h-1.5 sm:h-2 rounded-full transition-all duration-300"
-                style={{ width: `${((currentQuestion + 1) / quiz.length) * 100}%` }}
+                style={{ width: `${((currentQuestion + 1) / totalQuestions) * 100}%` }}
               ></div>
             </div>
           </div>
@@ -834,10 +871,10 @@ export default function LoveLetter() {
           {/* Question */}
           <div className="mb-6 sm:mb-8">
             <h2 className="text-lg sm:text-xl md:text-2xl font-serif text-amber-900 mb-4 sm:mb-6">
-              {quiz[currentQuestion].question}
+              {quiz[currentQuizIndex].question}
             </h2>
             <div className="space-y-2 sm:space-y-3">
-              {quiz[currentQuestion].options.map((option, index) => (
+              {quiz[currentQuizIndex].options.map((option, index) => (
                 <button
                   key={index}
                   onClick={() => handleAnswerSelect(index)}
@@ -865,7 +902,7 @@ export default function LoveLetter() {
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            {currentQuestion < quiz.length - 1 ? 'Next Question' : 'See Results'}
+            {currentQuestion < totalQuestions - 1 ? 'Next Question' : 'See Results'}
           </button>
         </div>
       </div>
@@ -875,6 +912,7 @@ export default function LoveLetter() {
   // Results Screen
   if (showResult && !isRevealed) {
     const percentage = getScorePercentage();
+    const isRetakeResult = isRetakingWrong;
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-amber-50 animate-gradient-shift-slow flex items-center justify-center p-3 sm:p-4">
@@ -883,7 +921,9 @@ export default function LoveLetter() {
             {percentage === 100 ? '🎉' : percentage >= 80 ? '😊' : percentage >= 60 ? '🙂' : percentage >= 40 ? '💕' : '💔'}
           </div>
           
-          <h1 className="text-3xl sm:text-4xl font-serif text-amber-900 mb-3 sm:mb-4">Quiz Complete!</h1>
+          <h1 className="text-3xl sm:text-4xl font-serif text-amber-900 mb-3 sm:mb-4">
+            {isRetakeResult ? 'Retake Complete!' : 'Quiz Complete!'}
+          </h1>
           
           <div className="text-5xl sm:text-6xl font-bold text-rose-500 mb-2">{percentage}%</div>
           <p className="text-sm sm:text-base text-amber-800 mb-4 sm:mb-6" style={{ fontFamily: 'Georgia, serif' }}>Your Score: {score} out of {quiz.length}</p>
@@ -891,7 +931,9 @@ export default function LoveLetter() {
           <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
             <p className="text-sm sm:text-base md:text-lg text-amber-900 leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
               {percentage === 100
-                ? "Perfect! You remember everything! You'll see the complete letter (all 6 paragraphs). ❤️"
+                ? isRetakeResult 
+                  ? "You will finally see the last paragraph (will also be my last message just for you). ❤️"
+                  : "Perfect! You remember everything! You'll see the complete letter (all 6 paragraphs). ❤️"
                 : percentage >= 90
                 ? `Amazing! You'll see 5 out of 6 paragraphs of the letter.`
                 : percentage >= 70
@@ -906,12 +948,24 @@ export default function LoveLetter() {
             </p>
           </div>
 
-          <button
-            onClick={() => setShowResult(false)}
-            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 active:shadow-md"
-          >
-            Open Your Letter
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <button
+              onClick={() => setShowResult(false)}
+              className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 active:shadow-md"
+            >
+              Open Your Letter
+            </button>
+            
+            {/* Show retake options if not perfect score */}
+            {percentage < 100 && wrongAnswers.length > 0 && (
+              <button
+                onClick={handleRetakeWrongOnly}
+                className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 active:shadow-md"
+              >
+                Retake Wrong Answers ({wrongAnswers.length}) 🔄
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -1229,13 +1283,24 @@ export default function LoveLetter() {
                               visibleParagraphs === 1 ? '30%+' : '10%+'
                             } to see more... 💕
                           </p>
-                          <button
-                            onClick={handleRetakeQuiz}
-                            className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-full font-medium hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-xs sm:text-sm"
-                            style={{ fontFamily: 'Georgia, serif' }}
-                          >
-                            Retake Quiz 🔄
-                          </button>
+                          <div className="flex flex-col gap-2">
+                            {wrongAnswers.length > 0 && (
+                              <button
+                                onClick={handleRetakeWrongOnly}
+                                className="inline-block bg-gradient-to-r from-rose-500 to-pink-500 text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-full font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-xs sm:text-sm"
+                                style={{ fontFamily: 'Georgia, serif' }}
+                              >
+                                Retake Wrong Answers ({wrongAnswers.length}) 🔄
+                              </button>
+                            )}
+                            <button
+                              onClick={handleRetakeQuiz}
+                              className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-full font-medium hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-xs sm:text-sm"
+                              style={{ fontFamily: 'Georgia, serif' }}
+                            >
+                              Retake Full Quiz 🔄
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
