@@ -1456,7 +1456,7 @@ export default function LoveLetter() {
                   <button
                     onClick={() => setShowPortrait(true)}
                     className="group relative"
-                    title="Click me to see yourportrait!"
+                    title="Click me to see your portrait!"
                   >
                     <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-rose-600 to-rose-800 shadow-xl flex items-center justify-center border-3 sm:border-4 border-rose-900/30 group-hover:scale-125 group-active:scale-95 transition-all duration-300 cursor-pointer animate-pulse">
                       <span className="text-rose-100 text-xl sm:text-2xl">❤</span>
