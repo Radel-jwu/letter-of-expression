@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Portrait from './Portrait';
 
 export default function LoveLetter() {
   const [isRevealed, setIsRevealed] = useState(false);
@@ -32,6 +33,8 @@ export default function LoveLetter() {
   const [wrongAnswers, setWrongAnswers] = useState([]); // Track wrong answers
   const [isRetakingWrong, setIsRetakingWrong] = useState(false); // Track if retaking wrong answers only
   const [questionsToRetake, setQuestionsToRetake] = useState([]); // Questions to retake
+  const [showPortrait, setShowPortrait] = useState(false); // Show portrait page
+  const [showHeartNotice, setShowHeartNotice] = useState(false); // Show notice to click heart
 
   const CORRECT_PASSWORD = "bem";
 
@@ -153,6 +156,10 @@ export default function LoveLetter() {
           index++;
         } else {
           clearInterval(typingInterval);
+          // Show heart notice after message is complete - reduced delay
+          setTimeout(() => {
+            setShowHeartNotice(true);
+          }, 500); // Reduced from 1000ms to 500ms
         }
       }, 50);
       return () => clearInterval(typingInterval);
@@ -1400,7 +1407,7 @@ export default function LoveLetter() {
               <div className="w-full bg-gradient-to-b from-amber-100 to-amber-200 border-b-2 border-amber-300 h-8 sm:h-12 rounded-t-lg"></div>
               
               {/* Closed envelope */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-b-xl sm:rounded-b-2xl shadow-2xl p-8 sm:p-12 md:p-16 text-center border-2 border-rose-200 relative overflow-hidden">
+              <div className="bg-white/90 backdrop-blur-sm rounded-b-xl sm:rounded-b-2xl shadow-2xl p-8 sm:p-12 md:p-16 text-center border-2 border-rose-200 relative overflow-visible">
                 {/* Paper texture */}
                 <div className="absolute inset-0 opacity-20 mix-blend-multiply pointer-events-none"
                   style={{
@@ -1428,32 +1435,58 @@ export default function LoveLetter() {
                 </div>
 
                 {/* Typed message */}
-                <div className="relative z-10">
-                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif text-rose-900 mb-4 sm:mb-6 min-h-[100px] sm:min-h-[120px] leading-relaxed px-2">
+                <div className="relative z-10 pb-12">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif text-rose-900 mb-2 sm:mb-3 leading-relaxed px-2">
                     {typedMessage}
-                    <span className="animate-blink">|</span>
+                    {!showHeartNotice && <span className="animate-blink">|</span>}
                   </h1>
                   
-                  {/* Hearts decoration */}
-                  <div className="flex justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
-                    <span className="text-rose-400 text-2xl sm:text-3xl animate-pulse" style={{ animationDelay: '0s' }}>♥</span>
-                    <span className="text-rose-500 text-3xl sm:text-4xl animate-pulse" style={{ animationDelay: '0.2s' }}>♥</span>
-                    <span className="text-rose-400 text-2xl sm:text-3xl animate-pulse" style={{ animationDelay: '0.4s' }}>♥</span>
-                  </div>
+                  {/* Text below the message */}
+                  {showHeartNotice && (
+                    <p className="text-amber-700 text-sm sm:text-base italic text-center mt-4 animate-fadeInUp" style={{ fontFamily: 'Georgia, serif' }}>
+                      Click the heart seal below to unlock
+                    </p>
+                  )}
                 </div>
               </div>
 
-              {/* Wax seal at bottom */}
-              <div className="absolute -bottom-5 sm:-bottom-6 left-1/2 -translate-x-1/2 z-20">
-                <div className="relative">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-rose-600 to-rose-800 shadow-xl flex items-center justify-center border-3 sm:border-4 border-rose-900/30">
-                    <span className="text-rose-100 text-xl sm:text-2xl">❤</span>
-                  </div>
-                  <div className="absolute inset-0 rounded-full bg-rose-600/30 blur-md animate-pulse"></div>
+              {/* Wax seal at bottom - CLICKABLE - ONLY SHOW AFTER TYPING COMPLETES - POSITIONED RELATIVE TO OUTER CONTAINER */}
+              {showHeartNotice && (
+                <div className="absolute -bottom-5 sm:-bottom-6 left-0 right-0 flex justify-center z-20 animate-fadeInUp">
+                  <button
+                    onClick={() => setShowPortrait(true)}
+                    className="group relative"
+                    title="Click me to see yourportrait!"
+                  >
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-rose-600 to-rose-800 shadow-xl flex items-center justify-center border-3 sm:border-4 border-rose-900/30 group-hover:scale-125 group-active:scale-95 transition-all duration-300 cursor-pointer animate-pulse">
+                      <span className="text-rose-100 text-xl sm:text-2xl">❤</span>
+                    </div>
+                    {/* Multiple glowing layers for emphasis */}
+                    <div className="absolute inset-0 rounded-full bg-rose-600/40 blur-md animate-pulse"></div>
+                    <div className="absolute inset-0 rounded-full bg-rose-400/30 blur-xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+                  </button>
                 </div>
-              </div>
+              )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Portrait Page - Using Portrait Component */}
+      {showPortrait && (
+        <div className="fixed inset-0 bg-black flex items-center justify-center z-50 overflow-hidden animate-fadeIn">
+          {/* Close button */}
+          <button
+            onClick={() => setShowPortrait(false)}
+            className="fixed top-4 right-4 z-50 bg-white/90 backdrop-blur-sm text-gray-900 hover:text-gray-600 transition-colors p-2 rounded-full shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Portrait Component */}
+          <Portrait />
         </div>
       )}
 
